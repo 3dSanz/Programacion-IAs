@@ -9,7 +9,8 @@ public class IAEnemy : MonoBehaviour
     enum State
     {
         Patrolling,
-        Chasing
+        Chasing,
+        Searching
     }
 
     State currentState;
@@ -21,6 +22,18 @@ public class IAEnemy : MonoBehaviour
     [SerializeField] Vector2 patrolAreaSize;
     [SerializeField] float visionRange = 15;
     [SerializeField] float visionAngle = 90;
+
+    Vector3 lastTargetPosition;
+
+    float searchTimer;
+    [SerializeField] float searchWaitTime = 15;
+    [SerializeField] float searchRadius = 30;
+    int position = 1;
+
+    [SerializeField] Transform spot1;
+    [SerializeField] Transform spot2;
+    [SerializeField] Transform spot3;
+    [SerializeField] Transform spot4;
     // Start is called before the first frame update
     void Awake()
     {
@@ -44,6 +57,35 @@ public class IAEnemy : MonoBehaviour
             case State.Chasing:
                 Chase();
             break;
+            case State.Searching:
+                Search();
+            break;
+        }
+    }
+
+    void Search()
+    {
+        if(OnRange() == true)
+        {
+            searchTimer = 0;
+            currentState = State.Chasing;
+        }
+
+        searchTimer += Time.deltaTime;
+
+        if(searchTimer < searchWaitTime)
+        {
+            if(enemyAgent.remainingDistance < 0.5f)
+            {
+                Debug.Log("Buscando punto aleatorio");
+                Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitSphere * searchRadius;
+                randomSearchPoint.y = lastTargetPosition.y;
+                enemyAgent.destination = randomSearchPoint;
+            }
+
+        }else
+        {
+            currentState = State.Patrolling;
         }
     }
 
@@ -56,7 +98,8 @@ public class IAEnemy : MonoBehaviour
 
         if(enemyAgent.remainingDistance < 0.5f)
         {
-            SetRandomPoint();
+            //SetRandomPoint();
+            SetPosition();
         }
 
     }
@@ -67,17 +110,58 @@ public class IAEnemy : MonoBehaviour
 
         if(OnRange() == false)
         {
-            currentState = State.Patrolling;
+            currentState = State.Searching;
         }
     }
 
-    void SetRandomPoint()
+    /*void SetRandomPoint()
     {
         float randomX = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
         float randomZ = Random.Range(-patrolAreaSize.y / 2, patrolAreaSize.y / 2);
         Vector3 randomPoint = new Vector3(randomX, 0f, randomZ) + patrolAreaCenter.position;
 
         enemyAgent.destination = randomPoint;
+    }*/
+
+    void SetPosition()
+    {
+        if(position == 1)
+        {
+            enemyAgent.destination = spot1.position;
+            
+        }
+
+        if(enemyAgent.destination == spot1.position)
+            {
+                position = 2;
+            }
+
+        if(position == 2)
+        {
+            enemyAgent.destination = spot2.position;
+            if(enemyAgent.destination == spot2.position)
+            {
+                position = 3;
+            }
+        }
+
+        if(position == 3)
+        {
+            enemyAgent.destination = spot3.position;
+            if(enemyAgent.destination == spot3.position)
+            {
+                position = 4;
+            }
+        }
+
+        if(position == 4)
+        {
+            enemyAgent.destination = spot4.position;
+            if(enemyAgent.destination == spot4.position)
+            {
+                position = 1;
+            }
+        }
     }
 
     bool OnRange()
@@ -96,11 +180,24 @@ public class IAEnemy : MonoBehaviour
 
         if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.5f)
         {
-            return true;
-        }else
-        {
-            return false;
+            if(playerTransform.position == lastTargetPosition)
+            {
+                return true;
+            }
+            //return true;
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position, directionToPlayer, out hit, distanceToPlayer))
+            {
+                if(hit.collider.CompareTag("Player"))
+                {
+                    lastTargetPosition = playerTransform.position;
+                    return true;
+                }
+                
+                return false;
+            }
         }
+            return false;
     }
 
     void OnDrawGizmos()
