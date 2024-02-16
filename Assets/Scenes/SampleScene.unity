@@ -38284,7 +38284,7 @@ MonoBehaviour:
   - {fileID: 2056416777}
   - {fileID: 837258505}
   - {fileID: 991515003}
-  attackRange: 15
+  attackRange: 3
   patrollingSpot: 0
 --- !u!43 &1181259822
 Mesh:

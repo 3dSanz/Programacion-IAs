@@ -274,7 +274,7 @@ public class IAEnemy : MonoBehaviour
             RaycastHit hit;
             if(Physics.Raycast(transform.position, directionToPlayer, out hit, attackRange))
             {
-                Debug.DrawRay(transform.position, directionToPlayer, Color.green);
+                Debug.DrawRay(transform.position, directionToPlayer * attackRange, Color.green);
                 if(hit.collider.CompareTag("Player"))
                 {
                     lastTargetPosition = playerTransform.position;
