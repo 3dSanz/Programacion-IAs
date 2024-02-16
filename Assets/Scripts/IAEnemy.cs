@@ -9,7 +9,9 @@ public class IAEnemy : MonoBehaviour
     enum State
     {
         Patrolling,
+        Waiting,
         Chasing,
+        Attacking,
         Searching
     }
 
@@ -28,12 +30,14 @@ public class IAEnemy : MonoBehaviour
     float searchTimer;
     [SerializeField] float searchWaitTime = 15;
     [SerializeField] float searchRadius = 30;
-    int position = 1;
 
-    [SerializeField] Transform spot1;
-    [SerializeField] Transform spot2;
-    [SerializeField] Transform spot3;
-    [SerializeField] Transform spot4;
+    [SerializeField] float patrolTimer;
+    [SerializeField] float patrolWaitTime = 5;
+    [SerializeField] Transform[] spot;
+
+    [SerializeField] float attackRange = 5;
+    [SerializeField] int patrollingSpot = 0;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -43,7 +47,11 @@ public class IAEnemy : MonoBehaviour
 
     void Start()
     {
-        currentState = State.Patrolling;
+        enemyAgent.destination = spot[0].position;
+         if(enemyAgent.remainingDistance < 0.5f)
+        {
+            currentState = State.Waiting;
+        }
     }
 
     // Update is called once per frame
@@ -54,8 +62,14 @@ public class IAEnemy : MonoBehaviour
             case State.Patrolling:
                 Patrol();
             break;
+            case State.Waiting:
+                Wait();
+            break;
             case State.Chasing:
                 Chase();
+            break;
+            case State.Attacking:
+                Attack();
             break;
             case State.Searching:
                 Search();
@@ -98,19 +112,48 @@ public class IAEnemy : MonoBehaviour
 
         if(enemyAgent.remainingDistance < 0.5f)
         {
-            //SetRandomPoint();
+            currentState = State.Waiting;
             SetPosition();
         }
 
+    }
+
+    void Attack()
+    {
+        Debug.Log("Atacado!");
+        currentState = State.Chasing;
     }
 
     void Chase()
     {
         enemyAgent.destination = playerTransform.position;
 
+        if(OnAttackRange() == true)
+        {
+            currentState = State.Attacking;
+        }
+
         if(OnRange() == false)
         {
             currentState = State.Searching;
+        }
+    }
+
+    void Wait()
+    {
+        if(enemyAgent.remainingDistance < 0.5f)
+        {
+        patrolTimer += Time.deltaTime;
+        if(patrolTimer >= patrolWaitTime)
+            {
+                currentState = State.Patrolling;
+                patrolTimer = 0;
+            }
+        }
+
+        if(OnRange() == true)
+        {
+            currentState = State.Chasing;
         }
     }
 
@@ -125,43 +168,58 @@ public class IAEnemy : MonoBehaviour
 
     void SetPosition()
     {
-        if(position == 1)
+       /* //Position 1
+        if(patrollingSpot == 0)
         {
-            enemyAgent.destination = spot1.position;
-            
+            enemyAgent.destination = spot[0].position;
         }
 
-        if(enemyAgent.destination == spot1.position)
-            {
-                position = 2;
-            }
-
-        if(position == 2)
+        if(transform.position == spot[0].position)
         {
-            enemyAgent.destination = spot2.position;
-            if(enemyAgent.destination == spot2.position)
-            {
-                position = 3;
-            }
+            patrollingSpot++;
+        }
+        
+        //Position 2
+        if(patrollingSpot == 1)
+        {
+            enemyAgent.destination = spot[1].position;
         }
 
-        if(position == 3)
+        if(transform.position == spot[1].position)
         {
-            enemyAgent.destination = spot3.position;
-            if(enemyAgent.destination == spot3.position)
-            {
-                position = 4;
-            }
+            patrollingSpot = 3;
         }
 
-        if(position == 4)
+        //Position 3
+        if(patrollingSpot == 3)
         {
-            enemyAgent.destination = spot4.position;
-            if(enemyAgent.destination == spot4.position)
-            {
-                position = 1;
-            }
+            enemyAgent.destination = spot[2].position;
         }
+
+        if(transform.position == spot[2].position)
+        {
+            patrollingSpot = 4;
+        }
+        
+        //Position 4
+        if(patrollingSpot == 4)
+        {
+            enemyAgent.destination = spot[3].position;
+        }
+
+        if(transform.position == spot[3].position)
+        {
+            patrollingSpot = 1;
+        }*/
+
+        patrollingSpot++;
+
+        if(patrollingSpot > 3)
+        {
+            patrollingSpot = 0;
+        }
+
+        enemyAgent.destination = spot[patrollingSpot].position;
     }
 
     bool OnRange()
@@ -200,6 +258,34 @@ public class IAEnemy : MonoBehaviour
             return false;
     }
 
+    bool OnAttackRange()
+    {
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.5f)
+        {
+            if(playerTransform.position == lastTargetPosition)
+            {
+                return true;
+            }
+            //return true;
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position, directionToPlayer, out hit, attackRange))
+            {
+                if(hit.collider.CompareTag("Player"))
+                {
+                    lastTargetPosition = playerTransform.position;
+                    return true;
+                }
+                
+                return false;
+            }
+        }
+            return false;
+    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
@@ -213,5 +299,6 @@ public class IAEnemy : MonoBehaviour
         Vector3 fovLine2= Quaternion.AngleAxis(-visionAngle * 0.5f, transform.up) * transform.forward * visionRange;
         Gizmos.DrawLine(transform.position, transform.position + fovLine1);
         Gizmos.DrawLine(transform.position, transform.position + fovLine2);
+
     }
 }

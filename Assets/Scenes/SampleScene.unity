@@ -22093,7 +22093,7 @@ Transform:
   m_GameObject: {fileID: 837258504}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.96, y: 58.39, z: 40.33}
+  m_LocalPosition: {x: -18.43, y: 58.11, z: 21.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35176,7 +35176,7 @@ Transform:
   m_GameObject: {fileID: 991515002}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.48, y: 58.39, z: 21.81}
+  m_LocalPosition: {x: 3.62, y: 58.14, z: 21.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38277,10 +38277,14 @@ MonoBehaviour:
   visionAngle: 90
   searchWaitTime: 15
   searchRadius: 30
-  spot1: {fileID: 1360541119}
-  spot2: {fileID: 2056416777}
-  spot3: {fileID: 837258505}
-  spot4: {fileID: 991515003}
+  patrolWaitTime: 5
+  spot:
+  - {fileID: 1360541119}
+  - {fileID: 2056416777}
+  - {fileID: 837258505}
+  - {fileID: 991515003}
+  attackRange: 15
+  patrollingSpot: 1
 --- !u!43 &1181259822
 Mesh:
   m_ObjectHideFlags: 0
@@ -39971,7 +39975,7 @@ Transform:
   m_GameObject: {fileID: 1360541118}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 58.39, z: 46.1}
+  m_LocalPosition: {x: 0, y: 58.25, z: 46.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -52160,7 +52164,7 @@ Transform:
   m_GameObject: {fileID: 2056416776}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.96, y: 58.39, z: 40.33}
+  m_LocalPosition: {x: -23.96, y: 58.24, z: 40.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
