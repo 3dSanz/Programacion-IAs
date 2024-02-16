@@ -47,7 +47,7 @@ public class IAEnemy : MonoBehaviour
 
     void Start()
     {
-        enemyAgent.destination = spot[0].position;
+        enemyAgent.destination = spot[patrollingSpot].position;
          if(enemyAgent.remainingDistance < 0.5f)
         {
             currentState = State.Waiting;
@@ -274,6 +274,7 @@ public class IAEnemy : MonoBehaviour
             RaycastHit hit;
             if(Physics.Raycast(transform.position, directionToPlayer, out hit, attackRange))
             {
+                Debug.DrawRay(transform.position, directionToPlayer, Color.green);
                 if(hit.collider.CompareTag("Player"))
                 {
                     lastTargetPosition = playerTransform.position;

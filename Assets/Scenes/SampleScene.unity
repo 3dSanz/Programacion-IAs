@@ -38277,6 +38277,7 @@ MonoBehaviour:
   visionAngle: 90
   searchWaitTime: 15
   searchRadius: 30
+  patrolTimer: 0
   patrolWaitTime: 5
   spot:
   - {fileID: 1360541119}
@@ -38284,7 +38285,7 @@ MonoBehaviour:
   - {fileID: 837258505}
   - {fileID: 991515003}
   attackRange: 15
-  patrollingSpot: 1
+  patrollingSpot: 0
 --- !u!43 &1181259822
 Mesh:
   m_ObjectHideFlags: 0
